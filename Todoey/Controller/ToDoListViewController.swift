@@ -7,10 +7,13 @@
 //
 
 import UIKit
+import CoreData
 
 class ToDoListViewController: UITableViewController{
     
     var itemArray = [Item]()
+    
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
     
     let dataPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
@@ -28,7 +31,7 @@ class ToDoListViewController: UITableViewController{
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoItemCell", for: indexPath)
         
-        cell.textLabel?.text = itemArray[indexPath.row].itemName
+        cell.textLabel?.text = itemArray[indexPath.row].title
         
         cell.accessoryType = itemArray[indexPath.row].done == true ? .checkmark : .none
         
@@ -67,8 +70,11 @@ class ToDoListViewController: UITableViewController{
         
         let action = UIAlertAction(title: "Add new ToDo", style: .default) { (action) in
             
-            let newItem = Item()
-            newItem.itemName = textField.text!
+            let newItem = Item(context: self.context)
+            newItem.done = false
+            newItem.title = textField.text!
+            
+            
             
             self.itemArray.append(newItem)
             
@@ -88,12 +94,10 @@ class ToDoListViewController: UITableViewController{
     }
     
     func saveData() {
-        let encoder = PropertyListEncoder()
+        
         
         do {
-            let data = try encoder.encode(itemArray)
-            
-            try? data.write(to: dataPath!)
+           try context.save()
             
         } catch {
             
@@ -104,23 +108,22 @@ class ToDoListViewController: UITableViewController{
         
     }
     
+
+    
     func loadData(){
-        if let data = try? Data(contentsOf: dataPath!) {
-            
-            let decoder = PropertyListDecoder()
-            
+       
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
             do {
-                itemArray = try decoder.decode([Item].self, from: data)
-                
+                itemArray = try context.fetch(request)
+
             }catch {
                 print (error)
             }
-            
-       
-            
+
+
+
         }
-        
-    }
-    
-    }
+
+}
+
 
