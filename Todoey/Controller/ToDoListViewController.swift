@@ -15,6 +15,13 @@ class ToDoListViewController: UITableViewController {
     
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
     
+    var selectedCategory : Category? {
+        didSet{
+            loadData()
+        }
+        
+    }
+    
     
     let dataPath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first
     
@@ -22,9 +29,10 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-        loadData()
+
         }
-    //Mark - Tableview Datasource Methods
+    
+//Mark - Tableview Datasource Methods
 
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -71,6 +79,7 @@ class ToDoListViewController: UITableViewController {
             
             let newItem = Item(context: self.context)
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             newItem.title = textField.text!
             
             

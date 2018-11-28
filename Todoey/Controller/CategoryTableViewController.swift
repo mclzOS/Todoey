@@ -23,7 +23,7 @@ class CategoryTableViewController: UITableViewController {
     }
     
     
-    //Mark: - Tableview Datasources
+//Mark: - Tableview Datasources
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
@@ -39,7 +39,7 @@ class CategoryTableViewController: UITableViewController {
         return categoryArray.count
     }
     
-    //Mark: - Data Manipulation Methods
+//Mark: - Data Manipulation Methods
     
     func saveCategory (){
         
@@ -64,8 +64,20 @@ class CategoryTableViewController: UITableViewController {
             tableView.reloadData()
         }
     
+     
+    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+        let swipeAction = UIContextualAction(style: .destructive, title: "done") { (UIContextualAction, view:UIView, success:(Bool) -> Void) in
+            success(true)
+            
+            self.context.delete(self.categoryArray[indexPath.row])
+            self.categoryArray.remove(at: indexPath.row)
+            tableView.reloadData()
+            
+        }
+        return UISwipeActionsConfiguration(actions: [swipeAction])
+    }
     
-    //Mark: - Add new Categories
+//Mark: - Add new Categories
     
     @IBAction func addNewCategories(_ sender: UIBarButtonItem) {
         
@@ -91,9 +103,28 @@ class CategoryTableViewController: UITableViewController {
         
         alert.addAction(action)
         present(alert, animated: true, completion: nil)
-            
-        
-        
         
 }
+    
+    
+//Mark: - TableView Delegate Methods
+    
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        performSegue(withIdentifier: "goToItem", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let destinationVC = segue.destination as! ToDoListViewController
+        
+        if let indexPath = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = categoryArray[indexPath.row]
+        }
+        
+    }
+    
+    
+    
+    
+    
 }
