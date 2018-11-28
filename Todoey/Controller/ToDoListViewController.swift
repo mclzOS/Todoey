@@ -9,7 +9,7 @@
 import UIKit
 import CoreData
 
-class ToDoListViewController: UITableViewController{
+class ToDoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
@@ -23,7 +23,6 @@ class ToDoListViewController: UITableViewController{
         // Do any additional setup after loading the view, typically from a nib.
         
         loadData()
-        
         }
     //Mark - Tableview Datasource Methods
 
@@ -79,14 +78,10 @@ class ToDoListViewController: UITableViewController{
             self.itemArray.append(newItem)
             
             self.saveData()
-
-           
-            
         }
         alert.addTextField { (alertTextField) in
             alertTextField.placeholder = "Create new item"
             textField = alertTextField
-            
         }
         
         alert.addAction(action)
@@ -110,20 +105,43 @@ class ToDoListViewController: UITableViewController{
     
 
     
-    func loadData(){
-       
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+    func loadData(with request : NSFetchRequest<Item> = Item.fetchRequest()){
             do {
                 itemArray = try context.fetch(request)
-
             }catch {
                 print (error)
             }
-
-
-
+        tableView.reloadData()
         }
 
+}
+
+extension ToDoListViewController: UISearchBarDelegate{
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        loadData(with: request)
+        
+    }
+    
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text!.count == 0 {
+            loadData()
+            
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+        }
+    }
+    
 }
 
 
