@@ -81,9 +81,7 @@ class ToDoListViewController: UITableViewController {
             newItem.done = false
             newItem.parentCategory = self.selectedCategory
             newItem.title = textField.text!
-            
-            
-            
+                        
             self.itemArray.append(newItem)
             
             self.saveData()
@@ -114,7 +112,17 @@ class ToDoListViewController: UITableViewController {
     
 
     
-    func loadData(with request : NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadData(with request : NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.categories MATCHES[cd] %@", selectedCategory!.categories!)
+        
+        if let additionalPredicate = predicate {
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [additionalPredicate,categoryPredicate])
+        }else {
+            request.predicate = categoryPredicate
+        }
+        
+        
             do {
                 itemArray = try context.fetch(request)
             }catch {
