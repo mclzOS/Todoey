@@ -7,13 +7,13 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryTableViewController: UITableViewController {
 
-    var categoryArray = [Category]()
+    var categoryArray: Results<Category>!
     
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
+    let realm = try! Realm()
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -23,13 +23,13 @@ class CategoryTableViewController: UITableViewController {
     }
     
     
-//Mark: - Tableview Datasources
+// Mark: - Tableview Datasources
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoCategory", for: indexPath)
         
-        cell.textLabel?.text = categoryArray[indexPath.row].categories
+        cell.textLabel?.text = categoryArray[indexPath.row].categoryName
         
         return cell
         
@@ -39,12 +39,14 @@ class CategoryTableViewController: UITableViewController {
         return categoryArray.count
     }
     
-//Mark: - Data Manipulation Methods
+// Mark: - Data Manipulation Methods
     
-    func saveCategory (){
+    func saveCategory (category: Category){
         
         do {
-            try context.save()
+            try realm.write{
+                realm.add(category)
+            }
             
         }catch {
             print ("This is the \(error)")
@@ -53,14 +55,10 @@ class CategoryTableViewController: UITableViewController {
     }
         
         
-    func loadCategory(with request : NSFetchRequest<Category> = Category.fetchRequest()) {
+    func loadCategory() {
         
-        do {
-            categoryArray = try context.fetch(request)
-            
-        }catch {
-            print ("This is the \(error)")
-        }
+        categoryArray = realm.objects(Category.self)
+        
             tableView.reloadData()
         }
     
@@ -69,15 +67,15 @@ class CategoryTableViewController: UITableViewController {
         let swipeAction = UIContextualAction(style: .destructive, title: "done") { (UIContextualAction, view:UIView, success:(Bool) -> Void) in
             success(true)
             
-            self.context.delete(self.categoryArray[indexPath.row])
-            self.categoryArray.remove(at: indexPath.row)
+            self.realm.delete(self.categoryArray[indexPath.row])
+            
             tableView.reloadData()
             
         }
         return UISwipeActionsConfiguration(actions: [swipeAction])
     }
     
-//Mark: - Add new Categories
+// Mark: - Add new Categories
     
     @IBAction func addNewCategories(_ sender: UIBarButtonItem) {
         
@@ -86,13 +84,13 @@ class CategoryTableViewController: UITableViewController {
         let alert = UIAlertController(title: "Add new categories", message: "", preferredStyle: .alert)
         
         let action = UIAlertAction(title: "Create category", style: .default) { (action) in
-            let newCategory = Category(context: self.context)
             
-            newCategory.categories = newCategoryString.text!
             
-            self.categoryArray.append(newCategory)
+            let newCategory = Category()
             
-            self.saveCategory()
+            newCategory.categoryName = newCategoryString.text!
+            
+            self.saveCategory(category: newCategory)
             
         }
         
@@ -107,7 +105,7 @@ class CategoryTableViewController: UITableViewController {
 }
     
     
-//Mark: - TableView Delegate Methods
+// Mark: - TableView Delegate Methods
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         performSegue(withIdentifier: "goToItem", sender: self)
