@@ -11,7 +11,7 @@ import RealmSwift
 
 class CategoryTableViewController: UITableViewController {
 
-    var categoryArray: Results<Category>!
+    var categoryArray: Results<Category>?
     
     let realm = try! Realm()
     
@@ -29,14 +29,14 @@ class CategoryTableViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "toDoCategory", for: indexPath)
         
-        cell.textLabel?.text = categoryArray[indexPath.row].categoryName
+        cell.textLabel?.text = categoryArray?[indexPath.row].categoryName ?? "No categories added yet"
         
         return cell
         
     }
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return categoryArray.count
+        return categoryArray?.count ?? 1
     }
     
 // Mark: - Data Manipulation Methods
@@ -67,7 +67,11 @@ class CategoryTableViewController: UITableViewController {
         let swipeAction = UIContextualAction(style: .destructive, title: "done") { (UIContextualAction, view:UIView, success:(Bool) -> Void) in
             success(true)
             
-            self.realm.delete(self.categoryArray[indexPath.row])
+            if self.categoryArray != nil {
+                self.realm.delete(self.categoryArray![indexPath.row])
+            }else {
+                return
+            }
             
             tableView.reloadData()
             
@@ -116,7 +120,7 @@ class CategoryTableViewController: UITableViewController {
         let destinationVC = segue.destination as! ToDoListViewController
         
         if let indexPath = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = categoryArray[indexPath.row]
+            destinationVC.selectedCategory = categoryArray?[indexPath.row]
         }
         
     }
