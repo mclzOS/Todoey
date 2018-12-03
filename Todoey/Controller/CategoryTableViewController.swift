@@ -68,7 +68,13 @@ class CategoryTableViewController: UITableViewController {
             success(true)
             
             if self.categoryArray != nil {
-                self.realm.delete(self.categoryArray![indexPath.row])
+                do {
+                    try self.realm.write {
+                        self.realm.delete(self.categoryArray![indexPath.row])
+                    } }
+                catch {
+                        print (error)
+                    }
             }else {
                 return
             }
