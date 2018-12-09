@@ -31,7 +31,7 @@ class ToDoListViewController: UITableViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view, typically from a nib.
         
-            print (Realm.Configuration.defaultConfiguration.fileURL)
+        print (Realm.Configuration.defaultConfiguration.fileURL!)
         }
     
 //Mark - Tableview Datasource Methods

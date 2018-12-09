@@ -9,7 +9,7 @@
 import UIKit
 import RealmSwift
 
-class CategoryTableViewController: UITableViewController {
+class CategoryTableViewController: SwipeTableViewController{
 
     var categoryArray: Results<Category>?
     
@@ -27,7 +27,7 @@ class CategoryTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "toDoCategory", for: indexPath)
+        let cell = super.tableView( tableView, cellForRowAt: indexPath)
         
         cell.textLabel?.text = categoryArray?[indexPath.row].categoryName ?? "No categories added yet"
         
@@ -63,27 +63,27 @@ class CategoryTableViewController: UITableViewController {
         }
     
      
-    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
-        let swipeAction = UIContextualAction(style: .destructive, title: "done") { (UIContextualAction, view:UIView, success:(Bool) -> Void) in
-            success(true)
-            
-            if self.categoryArray != nil {
-                do {
-                    try self.realm.write {
-                        self.realm.delete(self.categoryArray![indexPath.row])
-                    } }
-                catch {
-                        print (error)
-                    }
-            }else {
-                return
-            }
-            
-            tableView.reloadData()
-            
-        }
-        return UISwipeActionsConfiguration(actions: [swipeAction])
-    }
+//    override func tableView(_ tableView: UITableView, leadingSwipeActionsConfigurationForRowAt indexPath: IndexPath) -> UISwipeActionsConfiguration? {
+//        let swipeAction = UIContextualAction(style: .destructive, title: "done") { (UIContextualAction, view:UIView, success:(Bool) -> Void) in
+//            success(true)
+//
+//            if self.categoryArray != nil {
+//                do {
+//                    try self.realm.write {
+//                        self.realm.delete(self.categoryArray![indexPath.row])
+//                    } }
+//                catch {
+//                        print (error)
+//                    }
+//            }else {
+//                return
+//            }
+//
+//            tableView.reloadData()
+//
+//        }
+//        return UISwipeActionsConfiguration(actions: [swipeAction])
+//    }
     
 // Mark: - Add new Categories
     
